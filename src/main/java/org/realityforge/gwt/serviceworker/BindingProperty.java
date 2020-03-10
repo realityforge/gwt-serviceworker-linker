@@ -7,31 +7,11 @@ public final class BindingProperty
 {
   private final String _name;
   private final String _value;
-  private final String[] _components;
 
   public BindingProperty( @Nonnull final String name, @Nonnull final String value )
   {
     _name = name;
     _value = value;
-    _components = value.split( "," );
-  }
-
-  @Nonnull
-  public String getName()
-  {
-    return _name;
-  }
-
-  @Nonnull
-  public String getValue()
-  {
-    return _value;
-  }
-
-  @Nonnull
-  public String[] getComponents()
-  {
-    return _components;
   }
 
   @Override
