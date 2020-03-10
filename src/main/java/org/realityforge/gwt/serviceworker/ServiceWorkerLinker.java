@@ -175,8 +175,7 @@ public final class ServiceWorkerLinker
 
   private boolean shouldAddToManifest( @Nonnull final String path )
   {
-    return !( path.equals( "compilation-mappings.txt" ) || path.endsWith( ".devmode.js" ) ||
-              path.endsWith( ".cache.js.gz" ) );
+    return !( path.equals( "compilation-mappings.txt" ) || path.endsWith( ".devmode.js" ) );
   }
 
   /**
