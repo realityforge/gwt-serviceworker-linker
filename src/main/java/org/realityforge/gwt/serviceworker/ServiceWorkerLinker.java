@@ -155,9 +155,8 @@ public final class ServiceWorkerLinker
    * Write a manifest file for the given set of artifacts and return it as a
    * string
    *
-   * @param staticResources   - the static resources of the app, such as
-   *                          index.html file
-   * @param cacheResources    the gwt output artifacts like cache.html files
+   * @param staticResources - the static resources of the app, such as index.html file
+   * @param cacheResources  the gwt output artifacts like cache.html files
    * @return the manifest as a string
    */
   @Nonnull
@@ -189,7 +188,7 @@ public final class ServiceWorkerLinker
   @Nonnull
   Set<String> getConfigurationValues( @Nonnull final LinkerContext context, @Nonnull final String propertyName )
   {
-    final HashSet<String> set = new HashSet<>();
+    final Set<String> set = new HashSet<>();
     final SortedSet<ConfigurationProperty> properties = context.getConfigurationProperties();
     for ( final ConfigurationProperty configurationProperty : properties )
     {
@@ -228,7 +227,7 @@ public final class ServiceWorkerLinker
     {
       final Permutation permutation = artifact.getPermutation();
       final List<BindingProperty> calculatedBindings = new ArrayList<>();
-      final HashSet<String> completed = new HashSet<>();
+      final Set<String> completed = new HashSet<>();
 
       final List<SelectionDescriptor> selectors = permutation.getSelectors();
       final SelectionDescriptor firstSelector = selectors.iterator().next();
@@ -237,7 +236,7 @@ public final class ServiceWorkerLinker
         final String key = p.getName();
         if ( !completed.contains( key ) )
         {
-          final HashSet<String> values = collectValuesForKey( selectors, key );
+          final Set<String> values = collectValuesForKey( selectors, key );
           if ( 1 == selectors.size() || values.size() > 1 )
           {
             calculatedBindings.add( new BindingProperty( key, joinValues( values ) ) );
@@ -253,10 +252,9 @@ public final class ServiceWorkerLinker
   }
 
   @Nonnull
-  HashSet<String> collectValuesForKey( @Nonnull final List<SelectionDescriptor> selectors,
-                                       @Nonnull final String key )
+  Set<String> collectValuesForKey( @Nonnull final List<SelectionDescriptor> selectors, @Nonnull final String key )
   {
-    final HashSet<String> values = new HashSet<>();
+    final Set<String> values = new HashSet<>();
     for ( final SelectionDescriptor selector : selectors )
     {
       for ( final BindingProperty property : selector.getBindingProperties() )
