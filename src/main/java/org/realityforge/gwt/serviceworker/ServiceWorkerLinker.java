@@ -12,14 +12,14 @@ import com.google.gwt.core.ext.linker.EmittedArtifact.Visibility;
 import com.google.gwt.core.ext.linker.LinkerOrder;
 import com.google.gwt.core.ext.linker.Shardable;
 import com.google.gwt.core.ext.linker.impl.SelectionInformation;
+import com.google.gwt.util.tools.Utility;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -59,6 +59,9 @@ public final class ServiceWorkerLinker
   {
     final SortedSet<PermutationArtifact> permutationArtifacts = artifacts.find( PermutationArtifact.class );
 
+    // Resources declared in modules
+    final Collection<String> externalResources = getConfiguredStaticFiles( context );
+
     // Get files generated that are specific to particular permutations
     final Set<String> allPermutationFiles = permutationArtifacts.stream()
       .flatMap( artifact -> artifact.getPermutation().getPermutationFiles().stream() )
@@ -71,25 +74,26 @@ public final class ServiceWorkerLinker
     for ( final PermutationArtifact permutation : permutationArtifacts )
     {
       // make a copy of all artifacts
-      final Set<String> filesForCurrentPermutation = new HashSet<>( artifactsToCache );
+      final Set<String> permutationResourceToCache = new HashSet<>( artifactsToCache );
       // remove all permutations
-      filesForCurrentPermutation.removeAll( allPermutationFiles );
+      permutationResourceToCache.removeAll( allPermutationFiles );
       // add files of the one permutation we are interested in
       // leaving the common stuff for all permutations in...
       for ( final String file : permutation.getPermutation().getPermutationFiles() )
       {
         if ( artifactsToCache.contains( file ) )
         {
-          filesForCurrentPermutation.add( file );
+          permutationResourceToCache.add( file );
         }
       }
 
-      // build manifest
-      final Collection<String> externalFiles = getConfiguredStaticFiles( context );
-      final String maniFest = writeManifest( logger, externalFiles, filesForCurrentPermutation );
-      final String filename =
-        permutation.getPermutation().getPermutationName() + Permutation.PERMUTATION_MANIFEST_FILE_ENDING;
-      results.add( emitString( logger, maniFest, filename ) );
+      permutationResourceToCache.addAll( externalResources );
+      final String permutationName = permutation.getPermutation().getPermutationName();
+      // build serviceWorker
+      final String serviceWorkerJs =
+        writeServiceWorker( logger, context, permutationName, permutationResourceToCache );
+      final String filename = permutationName + "-sw.js";
+      results.add( emitString( logger, serviceWorkerJs, filename ) );
     }
 
     return results;
@@ -118,36 +122,49 @@ public final class ServiceWorkerLinker
     return !( path.equals( "compilation-mappings.txt" ) || path.endsWith( ".devmode.js" ) );
   }
 
-  /**
-   * Write a manifest file for the given set of artifacts and return it as a
-   * string
-   *
-   * @param staticResources - the static resources of the app, such as index.html file
-   * @param cacheResources  the gwt output artifacts like cache.html files
-   * @return the manifest as a string
-   */
   @Nonnull
-  String writeManifest( @Nonnull final TreeLogger logger,
-                        @Nonnull final Collection<String> staticResources,
-                        @Nonnull final Set<String> cacheResources )
+  private String writeServiceWorker( @Nonnull final TreeLogger logger,
+                                     @Nonnull final LinkerContext context,
+                                     @Nonnull final String permutationName,
+                                     @Nonnull final Set<String> resources )
     throws UnableToCompleteException
   {
-    final ManifestDescriptor descriptor = new ManifestDescriptor();
-    final List<String> cachedResources =
-      Stream
-        .concat( staticResources.stream(), cacheResources.stream() )
-        .sorted()
-        .distinct()
-        .collect( Collectors.toList() );
-    descriptor.getCachedResources().addAll( cachedResources );
+    final String resourceList =
+      resources.stream().sorted().distinct().map( v -> "'" + v + "'" ).collect( Collectors.joining( "," ) );
+    final StringBuffer serviceWorkerJs =
+      readFileToStringBuffer( "org/realityforge/gwt/serviceworker/ServiceWorkerTemplate.js", logger );
+    replaceAll( serviceWorkerJs, "__PERMUTATION_NAME__", permutationName );
+    replaceAll( serviceWorkerJs, "__RESOURCES__", resourceList );
+    return serviceWorkerJs.toString();
+    // TODO: Fix up template so it is ES3 compatible so it can be optimized?
+    //return context.optimizeJavaScript( logger, serviceWorkerJs.toString() );
+  }
+
+  @SuppressWarnings( "SameParameterValue" )
+  @Nonnull
+  private StringBuffer readFileToStringBuffer( @Nonnull final String filename,
+                                               @Nonnull final TreeLogger logger )
+    throws UnableToCompleteException
+  {
     try
     {
-      return descriptor.toString();
+      return new StringBuffer( Utility.getFileFromClassPath( filename ) );
     }
-    catch ( final Exception e )
+    catch ( IOException e )
     {
-      logger.log( Type.ERROR, "Error generating manifest: " + e, e );
+      logger.log( TreeLogger.ERROR, "Unable to read file: " + filename, e );
       throw new UnableToCompleteException();
+    }
+  }
+
+  private void replaceAll( @Nonnull final StringBuffer buf,
+                           @Nonnull final String search,
+                           @Nonnull final String replace )
+  {
+    final int len = search.length();
+    for ( int pos = buf.indexOf( search ); pos >= 0; pos = buf.indexOf( search, pos + 1 ) )
+    {
+      buf.replace( pos, pos + len, replace );
     }
   }
 
