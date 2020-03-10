@@ -108,8 +108,8 @@ public final class ServiceWorkerLinker
   }
 
   @Nonnull
-  final Map<String, String> parseFallbackResources( @Nonnull final TreeLogger logger,
-                                                    @Nonnull final Set<String> values )
+  Map<String, String> parseFallbackResources( @Nonnull final TreeLogger logger,
+                                              @Nonnull final Set<String> values )
     throws UnableToCompleteException
   {
     final HashMap<String, String> fallbackFiles = new HashMap<>();
@@ -130,9 +130,9 @@ public final class ServiceWorkerLinker
   }
 
   @Nonnull
-  final ArtifactSet perPermutationLink( @Nonnull final TreeLogger logger,
-                                        @Nonnull final LinkerContext context,
-                                        @Nonnull final ArtifactSet artifacts )
+  ArtifactSet perPermutationLink( @Nonnull final TreeLogger logger,
+                                  @Nonnull final LinkerContext context,
+                                  @Nonnull final ArtifactSet artifacts )
     throws UnableToCompleteException
   {
     final Permutation permutation = calculatePermutation( logger, context, artifacts );
@@ -148,7 +148,7 @@ public final class ServiceWorkerLinker
   }
 
   @Nonnull
-  final Set<String> getAllPermutationFiles( @Nonnull final ArrayList<PermutationArtifact> artifacts )
+  Set<String> getAllPermutationFiles( @Nonnull final ArrayList<PermutationArtifact> artifacts )
   {
     final Set<String> files = new HashSet<>();
     for ( final PermutationArtifact artifact : artifacts )
@@ -159,8 +159,8 @@ public final class ServiceWorkerLinker
   }
 
   @Nonnull
-  final Set<String> getArtifactsForCompilation( @Nonnull final LinkerContext context,
-                                                @Nonnull final ArtifactSet artifacts )
+  Set<String> getArtifactsForCompilation( @Nonnull final LinkerContext context,
+                                          @Nonnull final ArtifactSet artifacts )
   {
     final Set<String> artifactNames = new HashSet<>();
     for ( final EmittedArtifact artifact : artifacts.find( EmittedArtifact.class ) )
@@ -190,10 +190,10 @@ public final class ServiceWorkerLinker
    * @return the manifest as a string
    */
   @Nonnull
-  final String writeManifest( @Nonnull final TreeLogger logger,
-                              @Nonnull final Set<String> staticResources,
-                              @Nonnull final Map<String, String> fallbackResources,
-                              @Nonnull final Set<String> cacheResources )
+  String writeManifest( @Nonnull final TreeLogger logger,
+                        @Nonnull final Set<String> staticResources,
+                        @Nonnull final Map<String, String> fallbackResources,
+                        @Nonnull final Set<String> cacheResources )
     throws UnableToCompleteException
   {
     final ManifestDescriptor descriptor = new ManifestDescriptor();
@@ -218,7 +218,7 @@ public final class ServiceWorkerLinker
   }
 
   @Nonnull
-  final Set<String> getConfigurationValues( @Nonnull final LinkerContext context, @Nonnull final String propertyName )
+  Set<String> getConfigurationValues( @Nonnull final LinkerContext context, @Nonnull final String propertyName )
   {
     final HashSet<String> set = new HashSet<>();
     final SortedSet<ConfigurationProperty> properties = context.getConfigurationProperties();
@@ -234,8 +234,8 @@ public final class ServiceWorkerLinker
   }
 
   @Nonnull
-  final EmittedArtifact createPermutationMap( @Nonnull final TreeLogger logger,
-                                              @Nonnull final Collection<PermutationArtifact> artifacts )
+  EmittedArtifact createPermutationMap( @Nonnull final TreeLogger logger,
+                                        @Nonnull final Collection<PermutationArtifact> artifacts )
     throws UnableToCompleteException
   {
     try
@@ -251,8 +251,8 @@ public final class ServiceWorkerLinker
   }
 
   @Nonnull
-  final List<SelectionDescriptor> collectPermutationSelectors( @Nonnull final TreeLogger logger,
-                                                               @Nonnull final Collection<PermutationArtifact> artifacts )
+  List<SelectionDescriptor> collectPermutationSelectors( @Nonnull final TreeLogger logger,
+                                                         @Nonnull final Collection<PermutationArtifact> artifacts )
   {
     final List<SelectionDescriptor> descriptors = new ArrayList<>();
     for ( final PermutationArtifact artifact : artifacts )
@@ -284,8 +284,8 @@ public final class ServiceWorkerLinker
   }
 
   @Nonnull
-  final HashSet<String> collectValuesForKey( @Nonnull final List<SelectionDescriptor> selectors,
-                                             @Nonnull final String key )
+  HashSet<String> collectValuesForKey( @Nonnull final List<SelectionDescriptor> selectors,
+                                       @Nonnull final String key )
   {
     final HashSet<String> values = new HashSet<>();
     for ( final SelectionDescriptor selector : selectors )
@@ -302,7 +302,7 @@ public final class ServiceWorkerLinker
   }
 
   @Nonnull
-  final String joinValues( @Nonnull final Set<String> values )
+  String joinValues( @Nonnull final Set<String> values )
   {
     final StringBuilder sb = new StringBuilder();
     for ( final String value : values )
@@ -320,9 +320,9 @@ public final class ServiceWorkerLinker
    * Return the permutation for a single link step.
    */
   @Nullable
-  final Permutation calculatePermutation( @Nonnull final TreeLogger logger,
-                                          @Nonnull final LinkerContext context,
-                                          @Nonnull final ArtifactSet artifacts )
+  Permutation calculatePermutation( @Nonnull final TreeLogger logger,
+                                    @Nonnull final LinkerContext context,
+                                    @Nonnull final ArtifactSet artifacts )
     throws UnableToCompleteException
   {
     Permutation permutation = null;
