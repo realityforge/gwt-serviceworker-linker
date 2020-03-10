@@ -8,7 +8,6 @@ public class Permutation
   private final String _permutationName;
   private final List<SelectionDescriptor> _selectors = new ArrayList<>();
   private final HashSet<String> _permutationFiles = new HashSet<>();
-  private final HashMap<String, String> _fallbackFiles = new HashMap<>();
 
   public Permutation( final String permutationName )
   {
@@ -39,11 +38,6 @@ public class Permutation
   public Set<String> getPermutationFiles()
   {
     return _permutationFiles;
-  }
-
-  public Map<String, String> getFallbackFiles()
-  {
-    return _fallbackFiles;
   }
 
   public List<SelectionDescriptor> getSelectors()
