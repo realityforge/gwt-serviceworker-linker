@@ -120,12 +120,9 @@ public final class ServiceWorkerLinker
   @Nonnull
   Set<String> getAllPermutationFiles( @Nonnull final List<PermutationArtifact> artifacts )
   {
-    final Set<String> files = new HashSet<>();
-    for ( final PermutationArtifact artifact : artifacts )
-    {
-      files.addAll( artifact.getPermutation().getPermutationFiles() );
-    }
-    return files;
+    return artifacts.stream()
+      .flatMap( artifact -> artifact.getPermutation().getPermutationFiles().stream() )
+      .collect( Collectors.toSet() );
   }
 
   @Nonnull
