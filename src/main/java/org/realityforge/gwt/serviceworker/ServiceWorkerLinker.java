@@ -58,7 +58,7 @@ public final class ServiceWorkerLinker
                                       @Nonnull final ArtifactSet artifacts )
     throws UnableToCompleteException
   {
-    final ArrayList<PermutationArtifact> permutationArtifacts =
+    final List<PermutationArtifact> permutationArtifacts =
       new ArrayList<>( artifacts.find( PermutationArtifact.class ) );
     if ( 0 == permutationArtifacts.size() )
     {
@@ -119,7 +119,7 @@ public final class ServiceWorkerLinker
   }
 
   @Nonnull
-  Set<String> getAllPermutationFiles( @Nonnull final ArrayList<PermutationArtifact> artifacts )
+  Set<String> getAllPermutationFiles( @Nonnull final List<PermutationArtifact> artifacts )
   {
     final Set<String> files = new HashSet<>();
     for ( final PermutationArtifact artifact : artifacts )
