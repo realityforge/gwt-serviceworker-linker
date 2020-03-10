@@ -34,7 +34,7 @@ public final class ServiceWorkerLinker
   @Override
   public String getDescription()
   {
-    return "AppcacheLinker";
+    return "ServiceWorkerLinker";
   }
 
   @Override
