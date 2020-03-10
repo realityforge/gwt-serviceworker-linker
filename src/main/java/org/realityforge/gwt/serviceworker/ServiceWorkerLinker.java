@@ -188,6 +188,7 @@ public final class ServiceWorkerLinker
     return permutation;
   }
 
+  @Nonnull
   private Set<String> getArtifactsToCache( @Nonnull final LinkerContext context, @Nonnull final ArtifactSet artifacts )
   {
     return artifacts
@@ -195,7 +196,7 @@ public final class ServiceWorkerLinker
       .stream()
       .filter( artifact -> Visibility.Public == artifact.getVisibility() &&
                            shouldAddToManifest( artifact.getPartialPath() ) )
-      .map( artifact -> context.getModuleName() + "/" + artifact.getPartialPath() )
+      .map( EmittedArtifact::getPartialPath )
       .collect( Collectors.toSet() );
   }
 }
