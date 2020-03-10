@@ -15,10 +15,10 @@ import com.google.gwt.core.ext.linker.Shardable;
 import com.google.gwt.core.ext.linker.impl.SelectionInformation;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
@@ -29,8 +29,6 @@ import javax.annotation.Nullable;
 public final class ServiceWorkerLinker
   extends AbstractLinker
 {
-  private static final String STATIC_FILES_CONFIGURATION_PROPERTY_NAME = "appcache_static_files";
-
   @Override
   public String getDescription()
   {
@@ -91,7 +89,7 @@ public final class ServiceWorkerLinker
       }
 
       // build manifest
-      final Set<String> externalFiles = getConfigurationValues( context, STATIC_FILES_CONFIGURATION_PROPERTY_NAME );
+      final Collection<String> externalFiles = getConfiguredStaticFiles( context );
       final String maniFest = writeManifest( logger, externalFiles, filesForCurrentPermutation );
       final String filename =
         permutation.getPermutation().getPermutationName() + Permutation.PERMUTATION_MANIFEST_FILE_ENDING;
@@ -161,7 +159,7 @@ public final class ServiceWorkerLinker
    */
   @Nonnull
   String writeManifest( @Nonnull final TreeLogger logger,
-                        @Nonnull final Set<String> staticResources,
+                        @Nonnull final Collection<String> staticResources,
                         @Nonnull final Set<String> cacheResources )
     throws UnableToCompleteException
   {
@@ -186,19 +184,14 @@ public final class ServiceWorkerLinker
   }
 
   @Nonnull
-  Set<String> getConfigurationValues( @Nonnull final LinkerContext context, @Nonnull final String propertyName )
+  Collection<String> getConfiguredStaticFiles( @Nonnull final LinkerContext context )
   {
-    final Set<String> set = new HashSet<>();
-    final SortedSet<ConfigurationProperty> properties = context.getConfigurationProperties();
-    for ( final ConfigurationProperty configurationProperty : properties )
-    {
-      if ( propertyName.equals( configurationProperty.getName() ) )
-      {
-        set.addAll( configurationProperty.getValues() );
-      }
-    }
-
-    return set;
+    return context.getConfigurationProperties()
+      .stream()
+      .filter( p -> "serviceworker_static_files".equals( p.getName() ) )
+      .findFirst()
+      .map( ConfigurationProperty::getValues )
+      .orElse( Collections.emptyList() );
   }
 
   @Nonnull

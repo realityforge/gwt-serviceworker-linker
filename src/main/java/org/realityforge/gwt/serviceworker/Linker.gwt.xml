@@ -2,5 +2,5 @@
   <define-linker name="serviceworker" class="org.realityforge.gwt.serviceworker.ServiceWorkerLinker"/>
 
   <!-- Define the property that identifies additional static files that be included in the build -->
-  <define-configuration-property name="appcache_static_files" is-multi-valued="true"/>
+  <define-configuration-property name="serviceworker_static_files" is-multi-valued="true"/>
 </module>
