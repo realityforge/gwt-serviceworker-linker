@@ -15,10 +15,8 @@ import com.google.gwt.core.ext.linker.Shardable;
 import com.google.gwt.core.ext.linker.impl.SelectionInformation;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
@@ -32,7 +30,6 @@ public final class ServiceWorkerLinker
   extends AbstractLinker
 {
   private static final String STATIC_FILES_CONFIGURATION_PROPERTY_NAME = "appcache_static_files";
-  private static final String FALLBACK_FILES_CONFIGURATION_PROPERTY_NAME = "appcache_fallback_files";
 
   @Override
   public String getDescription()
@@ -95,9 +92,7 @@ public final class ServiceWorkerLinker
 
       // build manifest
       final Set<String> externalFiles = getConfigurationValues( context, STATIC_FILES_CONFIGURATION_PROPERTY_NAME );
-      final Map<String, String> fallbackFiles =
-        parseFallbackResources( logger, getConfigurationValues( context, FALLBACK_FILES_CONFIGURATION_PROPERTY_NAME ) );
-      final String maniFest = writeManifest( logger, externalFiles, fallbackFiles, filesForCurrentPermutation );
+      final String maniFest = writeManifest( logger, externalFiles, filesForCurrentPermutation );
       final String filename =
         permutation.getPermutation().getPermutationName() + Permutation.PERMUTATION_MANIFEST_FILE_ENDING;
       results.add( emitString( logger, maniFest, filename ) );
@@ -105,28 +100,6 @@ public final class ServiceWorkerLinker
 
     results.add( createPermutationMap( logger, permutationArtifacts ) );
     return results;
-  }
-
-  @Nonnull
-  Map<String, String> parseFallbackResources( @Nonnull final TreeLogger logger,
-                                              @Nonnull final Set<String> values )
-    throws UnableToCompleteException
-  {
-    final HashMap<String, String> fallbackFiles = new HashMap<>();
-    for ( final String line : values )
-    {
-      final String[] elements = line.trim().split( " +" );
-      if ( 2 != elements.length )
-      {
-        final String message = FALLBACK_FILES_CONFIGURATION_PROPERTY_NAME + " property value '" +
-                               line + "' should have two url paths separated by whitespace";
-        logger.log( Type.ERROR, message );
-        throw new UnableToCompleteException();
-      }
-      fallbackFiles.put( elements[ 0 ], elements[ 1 ] );
-    }
-
-    return fallbackFiles;
   }
 
   @Nonnull
@@ -184,14 +157,12 @@ public final class ServiceWorkerLinker
    *
    * @param staticResources   - the static resources of the app, such as
    *                          index.html file
-   * @param fallbackResources the fall back files to add to the manifest.
    * @param cacheResources    the gwt output artifacts like cache.html files
    * @return the manifest as a string
    */
   @Nonnull
   String writeManifest( @Nonnull final TreeLogger logger,
                         @Nonnull final Set<String> staticResources,
-                        @Nonnull final Map<String, String> fallbackResources,
                         @Nonnull final Set<String> cacheResources )
     throws UnableToCompleteException
   {
@@ -203,7 +174,6 @@ public final class ServiceWorkerLinker
         .distinct()
         .collect( Collectors.toList() );
     descriptor.getCachedResources().addAll( cachedResources );
-    descriptor.getFallbackResources().putAll( fallbackResources );
     descriptor.getNetworkResources().add( "*" );
     try
     {

@@ -1,10 +1,7 @@
 package org.realityforge.gwt.serviceworker;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 
 public final class ManifestDescriptor
@@ -15,8 +12,6 @@ public final class ManifestDescriptor
   private final List<String> _cachedResources = new ArrayList<>();
   ///List of resources that require the client to be online
   private final List<String> _networkResources = new ArrayList<>();
-  ///List of fallback resources
-  private final Map<String, String> _fallbackResources = new HashMap<>();
 
   @Nonnull
   public List<String> getCachedResources()
@@ -28,12 +23,6 @@ public final class ManifestDescriptor
   public List<String> getNetworkResources()
   {
     return _networkResources;
-  }
-
-  @Nonnull
-  public Map<String, String> getFallbackResources()
-  {
-    return _fallbackResources;
   }
 
   @Override
@@ -77,18 +66,6 @@ public final class ManifestDescriptor
       }
     }
 
-    if ( !_fallbackResources.isEmpty() )
-    {
-      sb.append( "\n\n" );
-      sb.append( "FALLBACK:\n" );
-      for ( final Entry<String, String> entry : _fallbackResources.entrySet() )
-      {
-        sb.append( urlEncode( entry.getKey() ) );
-        sb.append( " " );
-        sb.append( urlEncode( entry.getValue() ) );
-        sb.append( "\n" );
-      }
-    }
     return sb.toString();
   }
 
