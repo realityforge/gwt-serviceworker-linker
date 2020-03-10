@@ -6,7 +6,6 @@ public class Permutation
 {
   public static final String PERMUTATION_MANIFEST_FILE_ENDING = ".appcache";
   private final String _permutationName;
-  private final List<SelectionDescriptor> _selectors = new ArrayList<>();
   private final HashSet<String> _permutationFiles = new HashSet<>();
 
   public Permutation( final String permutationName )
@@ -38,10 +37,5 @@ public class Permutation
   public Set<String> getPermutationFiles()
   {
     return _permutationFiles;
-  }
-
-  public List<SelectionDescriptor> getSelectors()
-  {
-    return _selectors;
   }
 }

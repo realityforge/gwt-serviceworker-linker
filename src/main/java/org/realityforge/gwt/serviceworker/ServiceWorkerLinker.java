@@ -10,15 +10,14 @@ import com.google.gwt.core.ext.linker.ConfigurationProperty;
 import com.google.gwt.core.ext.linker.EmittedArtifact;
 import com.google.gwt.core.ext.linker.EmittedArtifact.Visibility;
 import com.google.gwt.core.ext.linker.LinkerOrder;
-import com.google.gwt.core.ext.linker.SelectionProperty;
 import com.google.gwt.core.ext.linker.Shardable;
 import com.google.gwt.core.ext.linker.impl.SelectionInformation;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
@@ -58,31 +57,28 @@ public final class ServiceWorkerLinker
                                       @Nonnull final ArtifactSet artifacts )
     throws UnableToCompleteException
   {
-    final List<PermutationArtifact> permutationArtifacts =
-      new ArrayList<>( artifacts.find( PermutationArtifact.class ) );
-    if ( 0 == permutationArtifacts.size() )
-    {
-      // hosted mode
-      return new ArtifactSet( artifacts );
-    }
+    final SortedSet<PermutationArtifact> permutationArtifacts = artifacts.find( PermutationArtifact.class );
 
-    final Set<String> allPermutationFiles = getAllPermutationFiles( permutationArtifacts );
+    // Get files generated that are specific to particular permutations
+    final Set<String> allPermutationFiles = permutationArtifacts.stream()
+      .flatMap( artifact -> artifact.getPermutation().getPermutationFiles().stream() )
+      .collect( Collectors.toSet() );
 
-    // get all artifacts
-    final Set<String> allArtifacts = getArtifactsForCompilation( context, artifacts );
+    // get all the "candidate" artifacts for caching
+    final Set<String> artifactsToCache = getArtifactsToCache( context, artifacts );
 
     final ArtifactSet results = new ArtifactSet( artifacts );
     for ( final PermutationArtifact permutation : permutationArtifacts )
     {
       // make a copy of all artifacts
-      final HashSet<String> filesForCurrentPermutation = new HashSet<>( allArtifacts );
+      final Set<String> filesForCurrentPermutation = new HashSet<>( artifactsToCache );
       // remove all permutations
       filesForCurrentPermutation.removeAll( allPermutationFiles );
       // add files of the one permutation we are interested in
       // leaving the common stuff for all permutations in...
       for ( final String file : permutation.getPermutation().getPermutationFiles() )
       {
-        if ( allArtifacts.contains( file ) )
+        if ( artifactsToCache.contains( file ) )
         {
           filesForCurrentPermutation.add( file );
         }
@@ -105,7 +101,7 @@ public final class ServiceWorkerLinker
                                   @Nonnull final ArtifactSet artifacts )
     throws UnableToCompleteException
   {
-    final Permutation permutation = calculatePermutation( logger, context, artifacts );
+    final Permutation permutation = buildPermutation( context, artifacts );
     if ( null == permutation )
     {
       logger.log( Type.ERROR, "Unable to calculate permutation " );
@@ -115,29 +111,6 @@ public final class ServiceWorkerLinker
     final ArtifactSet results = new ArtifactSet( artifacts );
     results.add( new PermutationArtifact( ServiceWorkerLinker.class, permutation ) );
     return results;
-  }
-
-  @Nonnull
-  Set<String> getAllPermutationFiles( @Nonnull final List<PermutationArtifact> artifacts )
-  {
-    return artifacts.stream()
-      .flatMap( artifact -> artifact.getPermutation().getPermutationFiles().stream() )
-      .collect( Collectors.toSet() );
-  }
-
-  @Nonnull
-  Set<String> getArtifactsForCompilation( @Nonnull final LinkerContext context,
-                                          @Nonnull final ArtifactSet artifacts )
-  {
-    final Set<String> artifactNames = new HashSet<>();
-    for ( final EmittedArtifact artifact : artifacts.find( EmittedArtifact.class ) )
-    {
-      if ( Visibility.Public == artifact.getVisibility() && shouldAddToManifest( artifact.getPartialPath() ) )
-      {
-        artifactNames.add( context.getModuleName() + "/" + artifact.getPartialPath() );
-      }
-    }
-    return artifactNames;
   }
 
   private boolean shouldAddToManifest( @Nonnull final String path )
@@ -189,85 +162,19 @@ public final class ServiceWorkerLinker
       .orElse( Collections.emptyList() );
   }
 
-  @Nonnull
-  List<SelectionDescriptor> collectPermutationSelectors( @Nonnull final TreeLogger logger,
-                                                         @Nonnull final Collection<PermutationArtifact> artifacts )
-  {
-    final List<SelectionDescriptor> descriptors = new ArrayList<>();
-    for ( final PermutationArtifact artifact : artifacts )
-    {
-      final Permutation permutation = artifact.getPermutation();
-      final List<BindingProperty> calculatedBindings = new ArrayList<>();
-      final Set<String> completed = new HashSet<>();
-
-      final List<SelectionDescriptor> selectors = permutation.getSelectors();
-      final SelectionDescriptor firstSelector = selectors.iterator().next();
-      for ( final BindingProperty p : firstSelector.getBindingProperties() )
-      {
-        final String key = p.getName();
-        if ( !completed.contains( key ) )
-        {
-          final Set<String> values = collectValuesForKey( selectors, key );
-          if ( 1 == selectors.size() || values.size() > 1 )
-          {
-            calculatedBindings.add( new BindingProperty( key, joinValues( values ) ) );
-          }
-          completed.add( key );
-        }
-      }
-      calculatedBindings.sort( ( o1, o2 ) -> o2.getComponents().length - o1.getComponents().length );
-      descriptors.add( new SelectionDescriptor( permutation.getPermutationName(), calculatedBindings ) );
-    }
-    logger.log( Type.DEBUG, "Permutation map created with " + descriptors.size() + " descriptors." );
-    return descriptors;
-  }
-
-  @Nonnull
-  Set<String> collectValuesForKey( @Nonnull final List<SelectionDescriptor> selectors, @Nonnull final String key )
-  {
-    final Set<String> values = new HashSet<>();
-    for ( final SelectionDescriptor selector : selectors )
-    {
-      for ( final BindingProperty property : selector.getBindingProperties() )
-      {
-        if ( property.getName().equals( key ) )
-        {
-          values.add( property.getValue() );
-        }
-      }
-    }
-    return values;
-  }
-
-  @Nonnull
-  String joinValues( @Nonnull final Set<String> values )
-  {
-    final StringBuilder sb = new StringBuilder();
-    for ( final String value : values )
-    {
-      if ( 0 != sb.length() )
-      {
-        sb.append( "," );
-      }
-      sb.append( value );
-    }
-    return sb.toString();
-  }
-
   /**
    * Return the permutation for a single link step.
    */
   @Nullable
-  Permutation calculatePermutation( @Nonnull final TreeLogger logger,
-                                    @Nonnull final LinkerContext context,
-                                    @Nonnull final ArtifactSet artifacts )
+  Permutation buildPermutation( @Nonnull final LinkerContext context,
+                                @Nonnull final ArtifactSet artifacts )
     throws UnableToCompleteException
   {
     Permutation permutation = null;
 
-    for ( final SelectionInformation result : artifacts.find( SelectionInformation.class ) )
+    for ( final SelectionInformation selectionInformation : artifacts.find( SelectionInformation.class ) )
     {
-      final String strongName = result.getStrongName();
+      final String strongName = selectionInformation.getStrongName();
       if ( null != permutation && !permutation.getPermutationName().equals( strongName ) )
       {
         throw new UnableToCompleteException();
@@ -275,34 +182,20 @@ public final class ServiceWorkerLinker
       if ( null == permutation )
       {
         permutation = new Permutation( strongName );
-        final Set<String> artifactsForCompilation = getArtifactsForCompilation( context, artifacts );
-        permutation.getPermutationFiles().addAll( artifactsForCompilation );
+        permutation.getPermutationFiles().addAll( getArtifactsToCache( context, artifacts ) );
       }
-      final List<BindingProperty> list = new ArrayList<>();
-      for ( final SelectionProperty property : context.getProperties() )
-      {
-        if ( !property.isDerived() )
-        {
-          final String name = property.getName();
-          final String value = result.getPropMap().get( name );
-          if ( null != value )
-          {
-            list.add( new BindingProperty( name, value ) );
-          }
-        }
-      }
-      final SelectionDescriptor selection = new SelectionDescriptor( strongName, list );
-      final List<SelectionDescriptor> selectors = permutation.getSelectors();
-      if ( !selectors.contains( selection ) )
-      {
-        selectors.add( selection );
-      }
-    }
-    if ( null != permutation )
-    {
-      logger.log( Type.DEBUG, "Calculated Permutation: " + permutation.getPermutationName() +
-                              " Selectors: " + permutation.getSelectors() );
     }
     return permutation;
+  }
+
+  private Set<String> getArtifactsToCache( @Nonnull final LinkerContext context, @Nonnull final ArtifactSet artifacts )
+  {
+    return artifacts
+      .find( EmittedArtifact.class )
+      .stream()
+      .filter( artifact -> Visibility.Public == artifact.getVisibility() &&
+                           shouldAddToManifest( artifact.getPartialPath() ) )
+      .map( artifact -> context.getModuleName() + "/" + artifact.getPartialPath() )
+      .collect( Collectors.toSet() );
   }
 }
