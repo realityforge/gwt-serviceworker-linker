@@ -1,13 +1,11 @@
 package org.realityforge.gwt.serviceworker;
 
-import javax.annotation.Nonnull;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import javax.annotation.Nonnull;
 
 public final class ManifestDescriptor
 {
@@ -38,97 +36,10 @@ public final class ManifestDescriptor
     return _fallbackResources;
   }
 
-  public void merge( @Nonnull final ManifestDescriptor other )
-  {
-    for ( final String resource : other.getCachedResources() )
-    {
-      if ( !_cachedResources.contains( resource ) )
-      {
-        _cachedResources.add( resource );
-      }
-    }
-    for ( final String resource : other.getNetworkResources() )
-    {
-      if ( !_networkResources.contains( resource ) )
-      {
-        _networkResources.add( resource );
-      }
-    }
-    _fallbackResources.putAll( other.getFallbackResources() );
-  }
-
   @Override
   public String toString()
   {
     return emitManifest();
-  }
-
-  public static ManifestDescriptor parse( final String manifest )
-    throws IllegalArgumentException
-  {
-    final String[] lines = manifest.split( "\n" );
-    if ( 0 == lines.length || !lines[ 0 ].equals( "CACHE MANIFEST" ) )
-    {
-      throw new IllegalArgumentException( "Manifest header not present" );
-    }
-    final ManifestDescriptor descriptor = new ManifestDescriptor();
-    final int cacheMode = 1;
-    final int networkMode = 2;
-    final int fallbackMode = 3;
-    int mode = cacheMode;
-    for ( int i = 1; i < lines.length; i++ )
-    {
-      final String line = lines[ i ].trim();
-      if ( line.startsWith( "#" ) || 0 == line.length() )
-      {
-        //noinspection UnnecessaryContinue
-        continue;
-      }
-      else if ( "CACHE:".equals( line ) )
-      {
-        mode = cacheMode;
-      }
-      else if ( "NETWORK:".equals( line ) )
-      {
-        mode = networkMode;
-      }
-      else if ( "FALLBACK:".equals( line ) )
-      {
-        mode = fallbackMode;
-      }
-      else if ( networkMode == mode )
-      {
-        descriptor.getNetworkResources().add( urlDecode( line ) );
-      }
-      else if ( cacheMode == mode )
-      {
-        descriptor.getCachedResources().add( urlDecode( line ) );
-      }
-      else
-      {
-        final String[] elements = line.split( " +" );
-        if ( 2 != elements.length )
-        {
-          final String message = "Fallback line '" + line + "' should have two url paths separated by whitespace";
-          throw new IllegalArgumentException( message );
-        }
-        descriptor.getFallbackResources().put( urlDecode( elements[ 0 ] ), urlDecode( elements[ 1 ] ) );
-      }
-    }
-    return descriptor;
-  }
-
-  private static String urlDecode( final String line )
-    throws IllegalStateException
-  {
-    try
-    {
-      return URLDecoder.decode( line, "UTF-8" );
-    }
-    catch ( final UnsupportedEncodingException uee )
-    {
-      throw new IllegalStateException( uee.getMessage(), uee );
-    }
   }
 
   private String emitManifest()
