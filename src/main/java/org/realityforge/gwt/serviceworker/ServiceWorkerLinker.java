@@ -170,7 +170,6 @@ public final class ServiceWorkerLinker
         .distinct()
         .collect( Collectors.toList() );
     descriptor.getCachedResources().addAll( cachedResources );
-    descriptor.getNetworkResources().add( "*" );
     try
     {
       return descriptor.toString();

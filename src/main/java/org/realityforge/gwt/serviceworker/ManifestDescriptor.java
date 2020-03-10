@@ -6,23 +6,13 @@ import javax.annotation.Nonnull;
 
 public final class ManifestDescriptor
 {
-  private static final String CATCH_ALL = "*";
-
   ///List of resources to cache
   private final List<String> _cachedResources = new ArrayList<>();
-  ///List of resources that require the client to be online
-  private final List<String> _networkResources = new ArrayList<>();
 
   @Nonnull
   public List<String> getCachedResources()
   {
     return _cachedResources;
-  }
-
-  @Nonnull
-  public List<String> getNetworkResources()
-  {
-    return _networkResources;
   }
 
   @Override
@@ -47,23 +37,6 @@ public final class ManifestDescriptor
     for ( final String resource : _cachedResources )
     {
       sb.append( urlEncode( resource ) ).append( "\n" );
-    }
-
-    if ( !_networkResources.isEmpty() )
-    {
-      sb.append( "\n\n" );
-      sb.append( "NETWORK:\n" );
-      for ( final String resource : _networkResources )
-      {
-        if ( CATCH_ALL.equals( resource ) )
-        {
-          sb.append( CATCH_ALL ).append( "\n" );
-        }
-        else
-        {
-          sb.append( urlEncode( resource ) ).append( "\n" );
-        }
-      }
     }
 
     return sb.toString();
