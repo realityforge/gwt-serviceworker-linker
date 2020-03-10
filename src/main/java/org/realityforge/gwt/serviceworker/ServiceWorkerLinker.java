@@ -152,7 +152,7 @@ public final class ServiceWorkerLinker
   }
 
   @Nonnull
-  Collection<String> getConfiguredStaticFiles( @Nonnull final LinkerContext context )
+  private Collection<String> getConfiguredStaticFiles( @Nonnull final LinkerContext context )
   {
     return context.getConfigurationProperties()
       .stream()
@@ -166,8 +166,7 @@ public final class ServiceWorkerLinker
    * Return the permutation for a single link step.
    */
   @Nullable
-  Permutation buildPermutation( @Nonnull final LinkerContext context,
-                                @Nonnull final ArtifactSet artifacts )
+  private Permutation buildPermutation( @Nonnull final LinkerContext context, @Nonnull final ArtifactSet artifacts )
     throws UnableToCompleteException
   {
     Permutation permutation = null;
