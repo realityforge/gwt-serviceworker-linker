@@ -1,0 +1,12 @@
+repositories:
+  remote:
+   - https://repo.maven.apache.org/maven2
+
+artifacts:
+  javax_annotation: org.realityforge.javax.annotation:javax.annotation:jar:1.0.1
+  gwt_user: org.realityforge.com.google.gwt:gwt-user:jar:2.8.2-v20191108
+  gwt_dev: org.realityforge.com.google.gwt:gwt-dev:jar:2.8.2-v20191108
+  javax_validation: javax.validation:validation-api:jar:1.0.0.GA
+
+  # Mocking library used in tests
+  mockito: org.mockito:mockito-all:jar:1.8.5
