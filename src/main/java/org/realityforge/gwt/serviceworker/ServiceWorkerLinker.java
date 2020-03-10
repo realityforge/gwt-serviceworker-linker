@@ -96,7 +96,6 @@ public final class ServiceWorkerLinker
       results.add( emitString( logger, maniFest, filename ) );
     }
 
-    results.add( createPermutationMap( logger, permutationArtifacts ) );
     return results;
   }
 
@@ -192,23 +191,6 @@ public final class ServiceWorkerLinker
       .findFirst()
       .map( ConfigurationProperty::getValues )
       .orElse( Collections.emptyList() );
-  }
-
-  @Nonnull
-  EmittedArtifact createPermutationMap( @Nonnull final TreeLogger logger,
-                                        @Nonnull final Collection<PermutationArtifact> artifacts )
-    throws UnableToCompleteException
-  {
-    try
-    {
-      final String string = PermutationsIO.serialize( collectPermutationSelectors( logger, artifacts ) );
-      return emitString( logger, string, PermutationsIO.PERMUTATIONS_DESCRIPTOR_FILE_NAME );
-    }
-    catch ( final Exception e )
-    {
-      logger.log( Type.ERROR, "can not build manifest map", e );
-      throw new UnableToCompleteException();
-    }
   }
 
   @Nonnull
