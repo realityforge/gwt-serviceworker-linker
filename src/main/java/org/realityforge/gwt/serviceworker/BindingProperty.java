@@ -34,18 +34,6 @@ public final class BindingProperty
     return _components;
   }
 
-  public boolean matches( @Nonnull final String value )
-  {
-    for ( final String component : _components )
-    {
-      if ( component.equals( value ) )
-      {
-        return true;
-      }
-    }
-    return false;
-  }
-
   @Override
   public int compareTo( @Nonnull final BindingProperty that )
   {
