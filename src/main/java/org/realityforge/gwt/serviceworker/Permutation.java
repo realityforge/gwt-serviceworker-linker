@@ -23,14 +23,9 @@ final class Permutation
   }
 
   @Override
-  public boolean equals( final Object obj )
+  public boolean equals( final Object other )
   {
-    if ( !( obj instanceof Permutation ) )
-    {
-      return false;
-    }
-    final Permutation other = (Permutation) obj;
-    return other._permutationName.equals( _permutationName );
+    return other instanceof Permutation && ( (Permutation) other )._permutationName.equals( _permutationName );
   }
 
   @Nonnull
