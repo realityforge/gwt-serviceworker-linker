@@ -1,13 +1,14 @@
 package org.realityforge.gwt.serviceworker;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
-public class Permutation
+final class Permutation
 {
   private final String _permutationName;
   private final HashSet<String> _permutationFiles = new HashSet<>();
 
-  public Permutation( final String permutationName )
+  Permutation( final String permutationName )
   {
     _permutationName = permutationName;
   }
@@ -28,12 +29,12 @@ public class Permutation
     return other._permutationName.equals( _permutationName );
   }
 
-  public String getPermutationName()
+  String getPermutationName()
   {
     return _permutationName;
   }
 
-  public Set<String> getPermutationFiles()
+  Set<String> getPermutationFiles()
   {
     return _permutationFiles;
   }
