@@ -6,7 +6,7 @@ import java.util.Set;
 final class Permutation
 {
   private final String _permutationName;
-  private final HashSet<String> _permutationFiles = new HashSet<>();
+  private final Set<String> _permutationFiles = new HashSet<>();
 
   Permutation( final String permutationName )
   {
