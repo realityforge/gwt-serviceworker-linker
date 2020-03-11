@@ -4,6 +4,9 @@ var filesToCache = [__RESOURCES__];
 
 self.addEventListener('install', function(e) {
   console.log(moduleName, '[ServiceWorker] Install');
+  // Claim all existing clients that would be managed by this service worker so
+  // that even the first time loading that they will go through the caching
+  clients.claim();
   e.waitUntil(
     caches.open(cacheName).then(function(cache) {
       console.log(moduleName, '[ServiceWorker] Caching app shell');
