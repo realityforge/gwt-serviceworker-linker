@@ -21,7 +21,8 @@ self.addEventListener('activate', function(e) {
       return Promise.all(keyList.map(function(key) {
         if (key !== cacheName) {
           console.log(moduleName, '[ServiceWorker] Removing old cache', key);
-          return caches.delete(key);
+          // Do this rather than caches.delete(key) as ES3 optimizer in GWT thinks delete is a keyword
+          return caches["delete"](key);
         }
       }));
     })

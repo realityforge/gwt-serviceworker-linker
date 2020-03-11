@@ -136,9 +136,7 @@ public final class ServiceWorkerLinker
     replaceAll( serviceWorkerJs, "__MODULE_NAME__", context.getModuleName() );
     replaceAll( serviceWorkerJs, "__PERMUTATION_NAME__", permutationName );
     replaceAll( serviceWorkerJs, "__RESOURCES__", resourceList );
-    return serviceWorkerJs.toString();
-    // TODO: Fix up template so it is ES3 compatible so it can be optimized?
-    //return context.optimizeJavaScript( logger, serviceWorkerJs.toString() );
+    return context.optimizeJavaScript( logger, serviceWorkerJs.toString() );
   }
 
   @SuppressWarnings( "SameParameterValue" )
