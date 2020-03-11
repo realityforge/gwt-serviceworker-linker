@@ -119,7 +119,7 @@ public final class ServiceWorkerLinker
 
   private boolean shouldAddToManifest( @Nonnull final String path )
   {
-    return !( path.equals( "compilation-mappings.txt" ) || path.endsWith( ".devmode.js" ) );
+    return !( path.equals( "compilation-mappings.txt" ) || path.endsWith( ".devmode.js" ) || path.contains( ".nocache." ) );
   }
 
   @Nonnull
