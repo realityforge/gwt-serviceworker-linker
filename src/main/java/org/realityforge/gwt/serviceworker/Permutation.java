@@ -17,6 +17,7 @@ final class Permutation
     _permutationName = Objects.requireNonNull( permutationName );
   }
 
+  @Override
   public int hashCode()
   {
     return _permutationName.hashCode();
