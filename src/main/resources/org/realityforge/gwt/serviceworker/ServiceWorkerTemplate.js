@@ -6,9 +6,6 @@ self.addEventListener('install', function(e) {
   console.log(moduleName, '[ServiceWorker] Install');
   // Immediately replace an existing serviceworker with the current service worker
   e.waitUntil(self.skipWaiting());
-  // Claim all existing clients that would be managed by this service worker so
-  // that even the first time loading that they will go through the caching
-  clients.claim();
   e.waitUntil(
     caches.open(cacheName).then(function(cache) {
       console.log(moduleName, '[ServiceWorker] Caching app shell');
@@ -29,6 +26,9 @@ self.addEventListener('activate', function(e) {
       }));
     })
   );
+  // Claim all existing clients that would be managed by this service worker so
+  // that even the first time loading that they will go through the sw caching
+  e.waitUntil(clients.claim());
 });
 
 self.addEventListener('fetch', function(e) {
