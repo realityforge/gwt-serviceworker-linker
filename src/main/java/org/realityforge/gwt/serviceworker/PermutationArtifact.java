@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 import java.util.Objects;
 
 @Transferable
-public class PermutationArtifact
+public final class PermutationArtifact
   extends Artifact<PermutationArtifact>
 {
   private static final long serialVersionUID = -2097933260935878782L;
