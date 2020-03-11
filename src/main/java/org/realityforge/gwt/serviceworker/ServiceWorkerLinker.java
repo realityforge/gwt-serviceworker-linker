@@ -133,6 +133,7 @@ public final class ServiceWorkerLinker
       resources.stream().sorted().distinct().map( v -> "'" + v + "'" ).collect( Collectors.joining( "," ) );
     final StringBuffer serviceWorkerJs =
       readFileToStringBuffer( "org/realityforge/gwt/serviceworker/ServiceWorkerTemplate.js", logger );
+    replaceAll( serviceWorkerJs, "__MODULE_NAME__", context.getModuleName() );
     replaceAll( serviceWorkerJs, "__PERMUTATION_NAME__", permutationName );
     replaceAll( serviceWorkerJs, "__RESOURCES__", resourceList );
     return serviceWorkerJs.toString();
