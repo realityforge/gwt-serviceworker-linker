@@ -4,7 +4,6 @@ import java.util.*;
 
 public class Permutation
 {
-  public static final String PERMUTATION_MANIFEST_FILE_ENDING = ".appcache";
   private final String _permutationName;
   private final HashSet<String> _permutationFiles = new HashSet<>();
 
