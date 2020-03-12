@@ -58,6 +58,13 @@ if ( null != navigator.serviceWorker )
       console.log( "ServiceWorker registration failed: ", error );
       return null;
     } );
+
+  navigator.serviceWorker.addEventListener( "controllerchange", e -> {
+    // This fires when the service worker controlling this page
+    // changes, eg a new worker has skipped waiting and become
+    // the new active worker.
+    console.log( "ServiceWorker updated ", e );
+  } );
 }
   ...
 ```
