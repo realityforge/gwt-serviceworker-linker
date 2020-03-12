@@ -1,5 +1,5 @@
 var moduleName = '__MODULE_NAME__';
-var moduleLabel = '[' + moduleName +']';
+var moduleLabel = '[' + moduleName + ']';
 var cacheName = '__CACHE_NAME__';
 var filesToPreCache = [__PRE_CACHE_RESOURCES__];
 var filesToCacheOnAccess = [__MAYBE_CACHE_RESOURCES__];
