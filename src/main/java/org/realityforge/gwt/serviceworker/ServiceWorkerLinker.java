@@ -32,6 +32,8 @@ public final class ServiceWorkerLinker
 {
   @Nonnull
   private static final String OPTIMIZE_SERVICEWORKER_CONFIG = "serviceworker_optimize_serviceworker";
+  @Nonnull
+  private static final String LOG_LEVEL_CONFIG = "serviceworker_log_level";
 
   @Override
   public String getDescription()
@@ -141,12 +143,27 @@ public final class ServiceWorkerLinker
     replaceAll( serviceWorkerJs, "__CACHE_NAME__", cacheName );
     replaceAll( serviceWorkerJs, "__PRE_CACHE_RESOURCES__", toJsArrayContents( commonResources ) );
     replaceAll( serviceWorkerJs, "__MAYBE_CACHE_RESOURCES__", toJsArrayContents( permutationResources ) );
+    final int logLevel = getIntegerConfigurationProperty( context, LOG_LEVEL_CONFIG, 1 );
+    replaceAll( serviceWorkerJs, "__LOG_LEVEL__", String.valueOf( logLevel ) );
 
     final boolean optimizeServiceWorker =
       getBooleanConfigurationProperty( context, OPTIMIZE_SERVICEWORKER_CONFIG, false );
     return optimizeServiceWorker ?
            context.optimizeJavaScript( logger, serviceWorkerJs.toString() ) :
            serviceWorkerJs.toString();
+  }
+
+  @SuppressWarnings( "SameParameterValue" )
+  private int getIntegerConfigurationProperty( @Nonnull final LinkerContext context,
+                                               @Nonnull final String key,
+                                               final int defaultValue )
+  {
+    return context.getConfigurationProperties()
+      .stream()
+      .filter( p -> key.equals( p.getName() ) )
+      .findAny()
+      .map( p -> Integer.parseInt( p.getValues().get( 0 ) ) )
+      .orElse( defaultValue );
   }
 
   @SuppressWarnings( "SameParameterValue" )

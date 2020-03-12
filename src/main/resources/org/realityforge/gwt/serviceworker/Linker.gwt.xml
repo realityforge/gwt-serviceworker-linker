@@ -7,4 +7,13 @@
   <!-- Should we run the optimizing compiler over the resultant javascript -->
   <define-configuration-property name="serviceworker_optimize_serviceworker" is-multi-valued="false"/>
   <set-configuration-property name="serviceworker_optimize_serviceworker" value="false"/>
+
+  <!--
+    The log level in generated service worker
+    0 = no logging
+    1 = state transition logging
+    2 = detailed logging around fetches
+   -->
+  <define-configuration-property name="serviceworker_log_level" is-multi-valued="false"/>
+  <set-configuration-property name="serviceworker_log_level" value="1"/>
 </module>
