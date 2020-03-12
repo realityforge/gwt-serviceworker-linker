@@ -49,17 +49,15 @@ import static elemental2.dom.DomGlobal.*;
 
 if ( null != navigator.serviceWorker )
 {
-  window.addEventListener( "load", e -> {
-    navigator.serviceWorker
-      .register( "/sw.js" )
-      .then( registration -> {
-        console.log( "ServiceWorker registration successful with scope: " + registration.getScope() );
-        return null;
-      }, error -> {
-        console.log( "ServiceWorker registration failed: ", error );
-        return null;
-      } );
-  } );
+  navigator.serviceWorker
+    .register( "/sw.js" )
+    .then( registration -> {
+      console.log( "ServiceWorker registration successful with scope: " + registration.getScope() );
+      return null;
+    }, error -> {
+      console.log( "ServiceWorker registration failed: ", error );
+      return null;
+    } );
 }
   ...
 ```
