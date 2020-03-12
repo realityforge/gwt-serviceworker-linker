@@ -30,6 +30,9 @@ import javax.annotation.Nullable;
 public final class ServiceWorkerLinker
   extends AbstractLinker
 {
+  @Nonnull
+  private static final String OPTIMIZE_SERVICEWORKER_CONFIG = "serviceworker_optimize_serviceworker";
+
   @Override
   public String getDescription()
   {
@@ -138,8 +141,15 @@ public final class ServiceWorkerLinker
     replaceAll( serviceWorkerJs, "__CACHE_NAME__", cacheName );
     replaceAll( serviceWorkerJs, "__PRE_CACHE_RESOURCES__", toJsArrayContents( commonResources ) );
     replaceAll( serviceWorkerJs, "__MAYBE_CACHE_RESOURCES__", toJsArrayContents( permutationResources ) );
-    //return context.optimizeJavaScript( logger, serviceWorkerJs.toString() );
-    return serviceWorkerJs.toString();
+    final boolean optimizeServiceWorker = context.getConfigurationProperties()
+      .stream()
+      .filter( p -> OPTIMIZE_SERVICEWORKER_CONFIG.equals( p.getName() ) )
+      .findAny()
+      .map( p -> p.getValues().get( 0 ).equals( "true" ) )
+      .orElse( false );
+    return optimizeServiceWorker ?
+           context.optimizeJavaScript( logger, serviceWorkerJs.toString() ) :
+           serviceWorkerJs.toString();
   }
 
   @Nonnull

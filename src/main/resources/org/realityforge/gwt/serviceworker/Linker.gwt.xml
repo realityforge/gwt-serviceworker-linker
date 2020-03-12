@@ -3,4 +3,8 @@
 
   <!-- Define the property that identifies additional static files that be included in the build -->
   <define-configuration-property name="serviceworker_static_files" is-multi-valued="true"/>
+
+  <!-- Should we run the optimizing compiler over the resultant javascript -->
+  <define-configuration-property name="serviceworker_optimize_serviceworker" is-multi-valued="false"/>
+  <set-configuration-property name="serviceworker_optimize_serviceworker" value="false"/>
 </module>
