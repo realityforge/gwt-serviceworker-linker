@@ -38,7 +38,34 @@ self.addEventListener('fetch', function(e) {
   console.log(moduleName, '[ServiceWorker] Fetch', e.request.url);
   e.respondWith(
     caches.match(e.request).then(function(response) {
-      return response || fetch(e.request);
+      if (response) {
+        return response;
+      } else {
+        // Only attempt to cache resources if they are in the filesToCacheOnAccess list
+        if (e.request.url.startsWith(self.registration.scope) &&
+            filesToCacheOnAccess[e.request.url.substring(self.registration.scope.length)]) {
+
+          // We call .clone() on the request since we might use it in a call to cache.put() later on.
+          // Both fetch() and cache.put() "consume" the request, so we need to make a copy.
+          // (see https://fetch.spec.whatwg.org/#dom-request-clone)
+          return fetch(e.request.clone()).then(function(networkResponse) {
+
+            // Need to clone response prior to accessing status otherwise
+            // accessing status marks it as used and not a candidate for cloning
+            const dup = networkResponse.clone();
+
+            if (200 === networkResponse.status) {
+              // Only cache successful loads
+              caches.open(cacheName).then(function(cache) {
+                cache.put(e.request, dup);
+              });
+            }
+            return networkResponse;
+          });
+        } else {
+          return fetch(e.request);
+        }
+      }
     })
   );
 });
