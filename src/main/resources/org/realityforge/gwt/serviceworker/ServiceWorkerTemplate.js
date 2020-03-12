@@ -1,26 +1,28 @@
-var moduleName = '[__MODULE_NAME__]';
-var cacheName = '__PERMUTATION_NAME__';
-var filesToCache = [__RESOURCES__];
+var moduleName = '__MODULE_NAME__';
+var moduleLabel = '[' + moduleName +']';
+var cacheName = '__CACHE_NAME__';
+var filesToPreCache = [__PRE_CACHE_RESOURCES__];
+var filesToCacheOnAccess = [__MAYBE_CACHE_RESOURCES__];
 
 self.addEventListener('install', function(e) {
-  console.log(moduleName, '[ServiceWorker] Install');
+  console.log(moduleLabel, '[ServiceWorker] Install');
   // Immediately replace an existing serviceworker with the current service worker
   e.waitUntil(self.skipWaiting());
   e.waitUntil(
     caches.open(cacheName).then(function(cache) {
-      console.log(moduleName, '[ServiceWorker] Caching app shell');
-      return cache.addAll(filesToCache);
+      console.log(moduleLabel, '[ServiceWorker] Caching app shell');
+      return cache.addAll(filesToPreCache);
     })
   );
 });
 
 self.addEventListener('activate', function(e) {
-  console.log(moduleName, '[ServiceWorker] Activate');
+  console.log(moduleLabel, '[ServiceWorker] Activate');
   e.waitUntil(
     caches.keys().then(function(keyList) {
       return Promise.all(keyList.map(function(key) {
         if (key !== cacheName) {
-          console.log(moduleName, '[ServiceWorker] Removing old cache', key);
+          console.log(moduleLabel, '[ServiceWorker] Removing old cache', key);
           // Do this rather than caches.delete(key) as ES3 optimizer in GWT thinks delete is a keyword
           return caches["delete"](key);
         }

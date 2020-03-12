@@ -13,6 +13,8 @@ import com.google.gwt.core.ext.linker.LinkerOrder;
 import com.google.gwt.core.ext.linker.Shardable;
 import com.google.gwt.core.ext.linker.impl.SelectionInformation;
 import com.google.gwt.util.tools.Utility;
+import com.google.gwt.util.tools.shared.Md5Utils;
+import com.google.gwt.util.tools.shared.StringUtils;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -62,39 +64,46 @@ public final class ServiceWorkerLinker
     // Resources declared in modules
     final Collection<String> externalResources = getConfiguredStaticFiles( context );
 
-    // Get files generated that are specific to particular permutations
-    final Set<String> allPermutationFiles = permutationArtifacts.stream()
-      .flatMap( artifact -> artifact.getPermutation().getPermutationFiles().stream() )
-      .collect( Collectors.toSet() );
+    final Set<String> commonResources =
+      permutationArtifacts.isEmpty() ?
+      new HashSet<>() :
+      new HashSet<>( permutationArtifacts.last().getPermutation().getPermutationFiles() );
 
-    // get all the "candidate" artifacts for caching
+    // This contains all the non-permutation artifacts i.e. assets in public dirs etc.
     final Set<String> artifactsToCache = getArtifactsToCache( artifacts );
 
-    final ArtifactSet results = new ArtifactSet( artifacts );
-    for ( final PermutationArtifact permutation : permutationArtifacts )
+    for ( final PermutationArtifact permutationArtifact : permutationArtifacts )
     {
-      // make a copy of all artifacts
-      final Set<String> permutationResourceToCache = new HashSet<>( artifactsToCache );
-      // remove all permutations
-      permutationResourceToCache.removeAll( allPermutationFiles );
-      // add files of the one permutation we are interested in
-      // leaving the common stuff for all permutations in...
-      for ( final String file : permutation.getPermutation().getPermutationFiles() )
+      final Set<String> files = permutationArtifact.getPermutation().getPermutationFiles();
+      artifactsToCache.removeAll( files );
+      commonResources.removeIf( f -> !files.contains( f ) );
+    }
+    commonResources.addAll( externalResources );
+    commonResources.addAll( artifactsToCache );
+
+    final Set<String> permutationResources = new HashSet<>();
+    for ( final PermutationArtifact permutationArtifact : permutationArtifacts )
+    {
+      final Set<String> files = permutationArtifact.getPermutation().getPermutationFiles();
+      for ( String file : files )
       {
-        if ( artifactsToCache.contains( file ) )
+        if ( !commonResources.contains( file ) )
         {
-          permutationResourceToCache.add( file );
+          permutationResources.add( file );
         }
       }
-
-      permutationResourceToCache.addAll( externalResources );
-      final String permutationName = permutation.getPermutation().getPermutationName();
-      // build serviceWorker
-      final String serviceWorkerJs =
-        writeServiceWorker( logger, context, permutationName, permutationResourceToCache );
-      final String filename = permutationName + "-sw.js";
-      results.add( emitString( logger, serviceWorkerJs, filename ) );
     }
+
+    final ArtifactSet results = new ArtifactSet( artifacts );
+
+    final String cacheName =
+      StringUtils.toHexString( Md5Utils.getMd5Digest( String.join( "|", commonResources ) +
+                                                      String.join( "|", permutationResources ) ) );
+    // build serviceWorker
+    final String serviceWorkerJs =
+      writeServiceWorker( logger, context, cacheName, commonResources, permutationResources );
+    final String filename = context.getModuleName() + "-sw.js";
+    results.add( emitString( logger, serviceWorkerJs, filename ) );
 
     return results;
   }
@@ -118,18 +127,25 @@ public final class ServiceWorkerLinker
   @Nonnull
   private String writeServiceWorker( @Nonnull final TreeLogger logger,
                                      @Nonnull final LinkerContext context,
-                                     @Nonnull final String permutationName,
-                                     @Nonnull final Set<String> resources )
+                                     @Nonnull final String cacheName,
+                                     @Nonnull final Set<String> commonResources,
+                                     @Nonnull final Set<String> permutationResources )
     throws UnableToCompleteException
   {
-    final String resourceList =
-      resources.stream().sorted().distinct().map( v -> "'" + v + "'" ).collect( Collectors.joining( "," ) );
     final StringBuffer serviceWorkerJs =
       readFileToStringBuffer( "org/realityforge/gwt/serviceworker/ServiceWorkerTemplate.js", logger );
     replaceAll( serviceWorkerJs, "__MODULE_NAME__", context.getModuleName() );
-    replaceAll( serviceWorkerJs, "__PERMUTATION_NAME__", permutationName );
-    replaceAll( serviceWorkerJs, "__RESOURCES__", resourceList );
-    return context.optimizeJavaScript( logger, serviceWorkerJs.toString() );
+    replaceAll( serviceWorkerJs, "__CACHE_NAME__", cacheName );
+    replaceAll( serviceWorkerJs, "__PRE_CACHE_RESOURCES__", toJsArrayContents( commonResources ) );
+    replaceAll( serviceWorkerJs, "__MAYBE_CACHE_RESOURCES__", toJsArrayContents( permutationResources ) );
+    //return context.optimizeJavaScript( logger, serviceWorkerJs.toString() );
+    return serviceWorkerJs.toString();
+  }
+
+  @Nonnull
+  private String toJsArrayContents( @Nonnull final Set<String> resources )
+  {
+    return resources.stream().sorted().distinct().map( v -> "'" + v + "'" ).collect( Collectors.joining( "," ) );
   }
 
   @SuppressWarnings( "SameParameterValue" )
