@@ -18,7 +18,7 @@ The simplest way to serviceworker enable a GWT application is to;
 <dependency>
    <groupId>org.realityforge.gwt.serviceworker</groupId>
    <artifactId>gwt-serviceworker-linker</artifactId>
-   <version>0.00</version>
+   <version>0.01</version>
    <scope>provided</scope>
 </dependency>
 ```
