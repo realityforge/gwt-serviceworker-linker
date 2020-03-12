@@ -115,11 +115,6 @@ public final class ServiceWorkerLinker
     return results;
   }
 
-  private boolean shouldAddToManifest( @Nonnull final String path )
-  {
-    return !( path.equals( "compilation-mappings.txt" ) || path.endsWith( ".devmode.js" ) || path.contains( ".nocache." ) );
-  }
-
   @Nonnull
   private String writeServiceWorker( @Nonnull final TreeLogger logger,
                                      @Nonnull final LinkerContext context,
@@ -207,9 +202,21 @@ public final class ServiceWorkerLinker
     return artifacts
       .find( EmittedArtifact.class )
       .stream()
-      .filter( artifact -> Visibility.Public == artifact.getVisibility() &&
-                           shouldAddToManifest( artifact.getPartialPath() ) )
+      .filter( this::shouldAddToManifest )
       .map( EmittedArtifact::getPartialPath )
       .collect( Collectors.toSet() );
+  }
+
+  private boolean shouldAddToManifest( @Nonnull final EmittedArtifact artifact )
+  {
+    return Visibility.Public == artifact.getVisibility() &&
+           shouldAddToManifest( artifact.getPartialPath() );
+  }
+
+  private boolean shouldAddToManifest( @Nonnull final String path )
+  {
+    return !( path.equals( "compilation-mappings.txt" ) ||
+              path.endsWith( ".devmode.js" ) ||
+              path.contains( ".nocache." ) );
   }
 }
