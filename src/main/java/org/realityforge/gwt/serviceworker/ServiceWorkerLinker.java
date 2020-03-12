@@ -43,7 +43,7 @@ public final class ServiceWorkerLinker
   {
     if ( onePermutation )
     {
-      return perPermutationLink( logger, context, artifacts );
+      return perPermutationLink( logger, artifacts );
     }
     else
     {
@@ -68,7 +68,7 @@ public final class ServiceWorkerLinker
       .collect( Collectors.toSet() );
 
     // get all the "candidate" artifacts for caching
-    final Set<String> artifactsToCache = getArtifactsToCache( context, artifacts );
+    final Set<String> artifactsToCache = getArtifactsToCache( artifacts );
 
     final ArtifactSet results = new ArtifactSet( artifacts );
     for ( final PermutationArtifact permutation : permutationArtifacts )
@@ -100,12 +100,10 @@ public final class ServiceWorkerLinker
   }
 
   @Nonnull
-  ArtifactSet perPermutationLink( @Nonnull final TreeLogger logger,
-                                  @Nonnull final LinkerContext context,
-                                  @Nonnull final ArtifactSet artifacts )
+  ArtifactSet perPermutationLink( @Nonnull final TreeLogger logger, @Nonnull final ArtifactSet artifacts )
     throws UnableToCompleteException
   {
-    final Permutation permutation = buildPermutation( context, artifacts );
+    final Permutation permutation = buildPermutation( artifacts );
     if ( null == permutation )
     {
       logger.log( Type.ERROR, "Unable to calculate permutation " );
@@ -182,7 +180,7 @@ public final class ServiceWorkerLinker
    * Return the permutation for a single link step.
    */
   @Nullable
-  private Permutation buildPermutation( @Nonnull final LinkerContext context, @Nonnull final ArtifactSet artifacts )
+  private Permutation buildPermutation( @Nonnull final ArtifactSet artifacts )
     throws UnableToCompleteException
   {
     Permutation permutation = null;
@@ -197,14 +195,14 @@ public final class ServiceWorkerLinker
       if ( null == permutation )
       {
         permutation = new Permutation( strongName );
-        permutation.getPermutationFiles().addAll( getArtifactsToCache( context, artifacts ) );
+        permutation.getPermutationFiles().addAll( getArtifactsToCache( artifacts ) );
       }
     }
     return permutation;
   }
 
   @Nonnull
-  private Set<String> getArtifactsToCache( @Nonnull final LinkerContext context, @Nonnull final ArtifactSet artifacts )
+  private Set<String> getArtifactsToCache( @Nonnull final ArtifactSet artifacts )
   {
     return artifacts
       .find( EmittedArtifact.class )
