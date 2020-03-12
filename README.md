@@ -50,7 +50,7 @@ import static elemental2.dom.DomGlobal.*;
 if ( null != navigator.serviceWorker )
 {
   navigator.serviceWorker
-    .register( "/sw.js" )
+    .register( GWT.getModuleName() + "-sw.js" )
     .then( registration -> {
       console.log( "ServiceWorker registration successful with scope: " + registration.getScope() );
       return null;
