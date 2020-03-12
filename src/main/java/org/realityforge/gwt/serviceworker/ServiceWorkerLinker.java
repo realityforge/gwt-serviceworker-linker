@@ -141,15 +141,25 @@ public final class ServiceWorkerLinker
     replaceAll( serviceWorkerJs, "__CACHE_NAME__", cacheName );
     replaceAll( serviceWorkerJs, "__PRE_CACHE_RESOURCES__", toJsArrayContents( commonResources ) );
     replaceAll( serviceWorkerJs, "__MAYBE_CACHE_RESOURCES__", toJsArrayContents( permutationResources ) );
-    final boolean optimizeServiceWorker = context.getConfigurationProperties()
-      .stream()
-      .filter( p -> OPTIMIZE_SERVICEWORKER_CONFIG.equals( p.getName() ) )
-      .findAny()
-      .map( p -> p.getValues().get( 0 ).equals( "true" ) )
-      .orElse( false );
+
+    final boolean optimizeServiceWorker =
+      getBooleanConfigurationProperty( context, OPTIMIZE_SERVICEWORKER_CONFIG, false );
     return optimizeServiceWorker ?
            context.optimizeJavaScript( logger, serviceWorkerJs.toString() ) :
            serviceWorkerJs.toString();
+  }
+
+  @SuppressWarnings( "SameParameterValue" )
+  private boolean getBooleanConfigurationProperty( @Nonnull final LinkerContext context,
+                                                   @Nonnull final String key,
+                                                   final boolean defaultValue )
+  {
+    return context.getConfigurationProperties()
+      .stream()
+      .filter( p -> key.equals( p.getName() ) )
+      .findAny()
+      .map( p -> p.getValues().get( 0 ).equals( "true" ) )
+      .orElse( defaultValue );
   }
 
   @Nonnull
