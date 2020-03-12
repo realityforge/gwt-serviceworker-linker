@@ -52,12 +52,12 @@ self.addEventListener('fetch', function(e) {
 
             // Need to clone response prior to accessing status otherwise
             // accessing status marks it as used and not a candidate for cloning
-            const dup = networkResponse.clone();
+            var dupResponse = networkResponse.clone();
 
             if (200 === networkResponse.status) {
               // Only cache successful loads
               caches.open(cacheName).then(function(cache) {
-                cache.put(e.request, dup);
+                cache.put(e.request, dupResponse);
               });
             }
             return networkResponse;
