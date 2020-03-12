@@ -1,7 +1,7 @@
 # gwt-serviceworker-linker
 
 [![Build Status](https://secure.travis-ci.org/realityforge/gwt-serviceworker-linker.svg?branch=master)](http://travis-ci.org/realityforge/gwt-serviceworker-linker)
-[<img src="https://img.shields.io/maven-central/v/org.realityforge.gwt.serviceworker/gwt-serviceworker-linker-client.svg?label=latest%20release"/>](https://search.maven.org/search?q=g:org.realityforge.gwt.serviceworker)
+[<img src="https://img.shields.io/maven-central/v/org.realityforge.gwt.serviceworker/gwt-serviceworker-linker.svg?label=latest%20release"/>](https://search.maven.org/search?q=g:org.realityforge.gwt.serviceworker)
 
 The [ServiceWorkers](https://www.w3.org/TR/service-workers/) specification enables applications
 to take advantage of persistent background processing, including hooks to enable bootstrapping
