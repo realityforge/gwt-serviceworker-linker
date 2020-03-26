@@ -137,13 +137,14 @@ public final class ServiceWorkerLinker
                                      @Nonnull final Set<String> permutationResources )
     throws UnableToCompleteException
   {
-    final StringBuffer serviceWorkerJs =
-      readFileToStringBuffer( "org/realityforge/gwt/serviceworker/ServiceWorkerTemplate.js", logger );
+    final int logLevel = getIntegerConfigurationProperty( context, LOG_LEVEL_CONFIG, 1 );
+    final String templateFilename =
+      "org/realityforge/gwt/serviceworker/ServiceWorkerTemplate" + ( 0 == logLevel ? "NoLogging" : "" ) + ".js";
+    final StringBuffer serviceWorkerJs = readFileToStringBuffer( templateFilename, logger );
     replaceAll( serviceWorkerJs, "__MODULE_NAME__", context.getModuleName() );
     replaceAll( serviceWorkerJs, "__CACHE_NAME__", cacheName );
     replaceAll( serviceWorkerJs, "__PRE_CACHE_RESOURCES__", toJsArrayContents( commonResources ) );
     replaceAll( serviceWorkerJs, "__MAYBE_CACHE_RESOURCES__", toJsArrayContents( permutationResources ) );
-    final int logLevel = getIntegerConfigurationProperty( context, LOG_LEVEL_CONFIG, 1 );
     replaceAll( serviceWorkerJs, "__LOG_LEVEL__", String.valueOf( logLevel ) );
 
     final boolean optimizeServiceWorker =
