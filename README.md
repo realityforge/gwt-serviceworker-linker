@@ -53,7 +53,7 @@ if ( null != navigator.serviceWorker )
     .register( GWT.getModuleName() + "-sw.js" )
     .then( registration -> {
       console.log( "ServiceWorker registration successful with scope: " + registration.getScope() );
-          
+
       // Every minute attempt to update the serviceWorker. If it does update
       // then the "controllerchange" event will fire.
       DomGlobal.setInterval( v -> registration.update(), 60000 );
