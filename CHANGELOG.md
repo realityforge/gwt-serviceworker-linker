@@ -1,5 +1,7 @@
 # Change Log
 
+### Unreleased
+
 ### [v0.02](https://github.com/realityforge/gwt-serviceworker-linker/tree/v0.02) (2020-03-27) · [Full Changelog](https://github.com/realityforge/gwt-serviceworker-linker/compare/v0.01...v0.02)
 
 * Change the default value of the configuration property `serviceworker_optimize_serviceworker` from `false` to `true`. As a result serviceworkers will be optimized and obfuscated by default.
