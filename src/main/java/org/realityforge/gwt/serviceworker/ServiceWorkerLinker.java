@@ -147,7 +147,7 @@ public final class ServiceWorkerLinker
     replaceAll( serviceWorkerJs, "__LOG_LEVEL__", String.valueOf( logLevel ) );
 
     final boolean optimizeServiceWorker =
-      getBooleanConfigurationProperty( context, OPTIMIZE_SERVICEWORKER_CONFIG, false );
+      getBooleanConfigurationProperty( context, OPTIMIZE_SERVICEWORKER_CONFIG, true );
     return optimizeServiceWorker ?
            context.optimizeJavaScript( logger, serviceWorkerJs.toString() ) :
            serviceWorkerJs.toString();

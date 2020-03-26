@@ -6,7 +6,7 @@
 
   <!-- Should we run the optimizing compiler over the resultant javascript -->
   <define-configuration-property name="serviceworker_optimize_serviceworker" is-multi-valued="false"/>
-  <set-configuration-property name="serviceworker_optimize_serviceworker" value="false"/>
+  <set-configuration-property name="serviceworker_optimize_serviceworker" value="true"/>
 
   <!--
     The log level in generated service worker
