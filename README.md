@@ -1,6 +1,6 @@
 # gwt-serviceworker-linker
 
-[![Build Status](https://api.travis-ci.com/realityforge/gwt-serviceworker-linker.svg?branch=master)](http://travis-ci.org/realityforge/gwt-serviceworker-linker)
+[![Build Status](https://api.travis-ci.com/realityforge/gwt-serviceworker-linker.svg?branch=master)](http://travis-ci.com/realityforge/gwt-serviceworker-linker)
 [<img src="https://img.shields.io/maven-central/v/org.realityforge.gwt.serviceworker/gwt-serviceworker-linker.svg?label=latest%20release"/>](https://search.maven.org/search?q=g:org.realityforge.gwt.serviceworker)
 
 The [ServiceWorkers](https://www.w3.org/TR/service-workers/) specification enables applications
