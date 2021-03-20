@@ -3,6 +3,8 @@ require 'buildr/git_auto_version'
 require 'buildr/gpg'
 require 'buildr/gwt'
 
+Buildr::MavenCentral.define_publish_tasks(:profile_name => 'org.realityforge', :username => 'realityforge')
+
 desc 'A GWT linker that generates a serviceworker'
 define 'gwt-serviceworker-linker' do
   project.group = 'org.realityforge.gwt.serviceworker'
