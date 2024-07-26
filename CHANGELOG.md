@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+* Update the `org.realityforge.javax.annotation` artifact to version `1.1.1`.
 * Upgrade the `au.com.stocksoftware.idea.codestyle` artifact to version `1.17`.
 
 ### [v0.02](https://github.com/realityforge/gwt-serviceworker-linker/tree/v0.02) (2020-03-27) · [Full Changelog](https://github.com/realityforge/gwt-serviceworker-linker/compare/v0.01...v0.02)
